@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String                 @id @default(cuid())
+  telegramId       BigInt                 @unique
+  username         String?
+  firstName        String?
+  lastName         String?
+  sharkPoints      BigInt                 @default(0)
+  lastDailyClaim   DateTime?
+  isBanned         Boolean                @default(false)
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  pointTransactions PointTransaction[]
+  casinoGames       CasinoGame[]
+  giveawayEntries   GiveawayParticipant[]
+  giveawaysWon      GiveawayWinner[]
+
+  @@index([telegramId])
+  @@index([sharkPoints])
+}
+
+model Group {
+  id          String   @id @default(cuid())
+  telegramId  BigInt   @unique
+  title       String?
+  isActive    Boolean  @default(true)
+  settings    String?  // JSON string for group-specific toggles
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([telegramId])
+}
+
+model PointTransaction {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount       BigInt   // positive for credit, negative for debit
+  balanceAfter BigInt
+  type         String   // DAILY_CLAIM, CASINO_WAGER, CASINO_PAYOUT, GIVEAWAY_WIN, ADMIN_ADJUST
+  referenceId  String?  // links to game ID, giveaway ID, or admin action
+  description  String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model CasinoGame {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameType   String   // DICE, COINFLIP, BLACKJACK
+  wager      BigInt
+  payout     BigInt   @default(0)
+  outcome    String   // WIN, LOSS, PUSH, PENDING
+  stateJson  String?  // serialized cards or dice rolls
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([gameType])
+  @@index([outcome])
+  @@index([createdAt])
+}
+
+model Giveaway {
+  id               String                @id @default(cuid())
+  title            String
+  prizeDescription String
+  winnersCount     Int                   @default(1)
+  minSharkPoints   BigInt                @default(0)
+  status           String                @default("ACTIVE") // ACTIVE, ENDED, CANCELLED
+  endsAt           DateTime
+  messageId        Int?                  // Telegram message ID of announcement
+  chatId           BigInt?
+  createdBy        BigInt                // Admin Telegram ID
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  participants     GiveawayParticipant[]
+  winners          GiveawayWinner[]
+
+  @@index([status])
+  @@index([endsAt])
+}
+
+model GiveawayParticipant {
+  id         String   @id @default(cuid())
+  giveawayId String
+  giveaway   Giveaway @relation(fields: [giveawayId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enteredAt  DateTime @default(now())
+
+  @@unique([giveawayId, userId])
+  @@index([giveawayId])
+  @@index([userId])
+}
+
+model GiveawayWinner {
+  id          String   @id @default(cuid())
+  giveawayId  String
+  giveaway    Giveaway @relation(fields: [giveawayId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prize       String
+  announcedAt DateTime @default(now())
+
+  @@index([giveawayId])
+  @@index([userId])
+}
+
+model BuyTransaction {
+  id             String   @id @default(cuid())
+  txHash         String   @unique
+  chain          String
+  tokenAddress   String
+  buyerAddress   String
+  amountTokens   String
+  amountBase     String
+  amountUsd      Float
+  marketCapUsd   Float?
+  priceChange24h Float?
+  blockNumber    BigInt?
+  notifiedAt     DateTime @default(now())
+
+  @@index([txHash])
+  @@index([notifiedAt])
+}
+
+model FeatureFlag {
+  key         String   @id
+  enabled     Boolean  @default(false)
+  description String?
+  updatedAt   DateTime @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    BigInt?  // Telegram ID of actor or system
+  action     String   // e.g. FEATURE_TOGGLED, GIVEAWAY_CREATED, POINTS_ADJUSTED
+  detailsJson String? // JSON metadata
+  createdAt  DateTime @default(now())
+
+  @@index([action])
+  @@index([createdAt])
+}

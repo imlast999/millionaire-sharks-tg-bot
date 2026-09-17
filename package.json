@@ -1,0 +1,48 @@
+{
+  "name": "millionaire-sharks-tg-bot",
+  "version": "1.0.0",
+  "description": "Millionaire Sharks All-in-One Telegram Community Bot",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio",
+    "features:status": "tsx scripts/statusFeatures.ts",
+    "features:enable-all": "tsx scripts/activateAllFeatures.ts",
+    "features:reset-day-one": "tsx scripts/resetToDayOne.ts",
+    "simulate:buy": "tsx scripts/simulateBuy.ts",
+    "simulate:welcome": "tsx scripts/simulateWelcome.ts"
+  },
+  "keywords": [
+    "telegram-bot",
+    "crypto",
+    "buybot",
+    "community",
+    "millionaire-sharks"
+  ],
+  "author": "Millionaire Sharks Syndicate",
+  "license": "ISC",
+  "dependencies": {
+    "@grammyjs/ratelimiter": "^1.2.0",
+    "@grammyjs/runner": "^2.0.3",
+    "@prisma/client": "^6.4.1",
+    "axios": "^1.7.9",
+    "bignumber.js": "^9.1.2",
+    "dotenv": "^16.4.7",
+    "grammy": "^1.35.0",
+    "viem": "^2.23.5",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.9",
+    "prisma": "^6.4.1",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.7"
+  }
+}
