@@ -2,6 +2,7 @@ import { Bot, Context } from "grammy";
 import { adminGuard } from "../middleware/auth.js";
 import { featureManager } from "../../features/featureManager.js";
 import { FEATURE_KEYS, FeatureKey } from "../../features/types.js";
+import { syncBotCommands } from "../commands.js";
 import { buyMonitor } from "../../services/blockchain/buyMonitor.js";
 import { updateSharkPoints } from "../../db/services/userService.js";
 import { createAuditLog } from "../../db/services/auditService.js";
@@ -48,6 +49,9 @@ export function registerAdminHandlers(bot: Bot) {
 
       await createAuditLog("FEATURE_TOGGLED", BigInt(ctx.from!.id), { key, enabled: newState });
 
+      // Automatically sync Telegram's command suggestion list
+      await syncBotCommands(bot);
+
       await ctx.reply(
         `✅ *Feature Updated*: \`${key}\` is now *${newState ? "ENABLED 🟢" : "DISABLED 🔴"}*`,
         { parse_mode: "Markdown" }
@@ -69,6 +73,9 @@ export function registerAdminHandlers(bot: Bot) {
       await createAuditLog("ALL_FEATURES_ACTIVATED", BigInt(ctx.from!.id), {
         timestamp: new Date().toISOString(),
       });
+
+      // Automatically update Telegram command suggestions to include all newly unlocked commands
+      await syncBotCommands(bot);
 
       const summary = result.states
         .map((s) => `✅ *\`${s.key}\`*: ACTIVE`)
