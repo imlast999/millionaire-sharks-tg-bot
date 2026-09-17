@@ -16,7 +16,9 @@
     "features:enable-all": "tsx scripts/activateAllFeatures.ts",
     "features:reset-day-one": "tsx scripts/resetToDayOne.ts",
     "simulate:buy": "tsx scripts/simulateBuy.ts",
-    "simulate:welcome": "tsx scripts/simulateWelcome.ts"
+    "simulate:welcome": "tsx scripts/simulateWelcome.ts",
+    "reload": "tsc && pm2 restart sharks-bot",
+    "update": "git pull && tsc && pm2 restart sharks-bot"
   },
   "keywords": [
     "telegram-bot",

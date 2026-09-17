@@ -100,9 +100,9 @@ export function createBot(): Bot {
   bot.command("ca", async (ctx) => {
     const ca =
       config.TOKEN_CONTRACT_ADDRESS &&
-      config.TOKEN_CONTRACT_ADDRESS !== "0x0000000000000000000000000000000000000000"
+        config.TOKEN_CONTRACT_ADDRESS !== "0x0000000000000000000000000000000000000000"
         ? config.TOKEN_CONTRACT_ADDRESS
-        : "0xSomething";
+        : "No CA yet. Announcement Soon...";
 
     await ctx.reply(`\`${ca}\``, { parse_mode: "Markdown" });
   });
@@ -110,13 +110,13 @@ export function createBot(): Bot {
   bot.command("help", async (ctx) => {
     await ctx.reply(
       `🦈 *MILLIONAIRE SHARKS COMMUNITY BOT*\n\n` +
-        `• \`/start\` — Welcome greeting\n` +
-        `• \`/daily\` — Claim daily Shark Points (when active)\n` +
-        `• \`/casino\` — Virtual casino lounge (when active)\n` +
-        `• \`/leaderboard\` — Top Shark Points holders\n` +
-        `• \`/rank\` — Check your syndicate status\n` +
-        `• \`/giveaway\` — Community giveaways\n` +
-        `• \`/admin\` — Executive syndicate dashboard (Admins only)`,
+      `• \`/start\` — Welcome greeting\n` +
+      `• \`/daily\` — Claim daily Shark Points (when active)\n` +
+      `• \`/casino\` — Virtual casino lounge (when active)\n` +
+      `• \`/leaderboard\` — Top Shark Points holders\n` +
+      `• \`/rank\` — Check your syndicate status\n` +
+      `• \`/giveaway\` — Community giveaways\n` +
+      `• \`/admin\` — Executive syndicate dashboard (Admins only)`,
       { parse_mode: "Markdown" }
     );
   });
